@@ -5,7 +5,7 @@ use strict;
 
 use base 'HTML::WikiConverter';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 NAME
 
@@ -14,8 +14,7 @@ HTML::WikiConverter::Socialtext - Convert HTML to Socialtext markup
 =head1 SYNOPSIS
 
   use HTML::WikiConverter;
-  my $wc = new HTML::WikiConverter( dialect => 'Socialtext', 
-                                   );
+  my $wc = new HTML::WikiConverter( dialect => 'Socialtext');
   print $wc->html2wiki( $html );
 
 =head1 DESCRIPTION
@@ -38,12 +37,12 @@ sub rules {
     h6 => { start => '^^^^^^ ', block => 1, trim => 'both', line_format => 'single' },
 
     p      => { block => 1, line_format => 'multi' },
-    b      => { start => '*', end => '*', line_format => 'single' },
+    b      => { start => '*', end => '*', line_format => 'single', trim => 'both' },
     strong => { alias => 'b' },
-    i      => { start => '_', end => '_', line_format => 'single' },
+    i      => { start => '_', end => '_', line_format => 'single', trim => 'both' },
     em     => { alias => 'i' },
-    u      => { start => '_', end => '_', line_format => 'single' },
-    strike => { start => '-', end => '-', line_format => 'single' },
+    u      => { start => '_', end => '_', line_format => 'single', trim => 'both' },
+    strike => { start => '-', end => '-', line_format => 'single', trim => 'both' },
     s      => { alias => 'strike' },
 
     tt   => { start => '`', end => '`', trim => 'both', line_format => 'single' },
@@ -118,9 +117,13 @@ sub _get_clean_name {
 sub _image {
   my( $self, $node, $rules ) = @_;
   my $image_file = $node->attr('src');
-  $image_file =~ s/.*\/([^\/]+)$/$1/g;
-  $image_file =~ s/\?action=.*$//g;
-  return '{image: ' . $image_file . '} ' || '';
+  if ( $image_file !~ /http/) {
+    $image_file =~ s/.*\/([^\/]+)$/$1/g;
+    $image_file =~ s/\?action=.*$//g;
+    return '{image: ' . $image_file . '} ' || '';
+  } else {
+    return $image_file;
+  }
 }
 
 sub preprocess_node {
@@ -129,6 +132,8 @@ sub preprocess_node {
   return unless $node->tag;
   $self->caption2para($node) if $node->tag eq 'caption';
 }
+
+
 
 sub postprocess_output {
     my( $self, $outref ) = @_;

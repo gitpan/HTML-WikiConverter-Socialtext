@@ -10,6 +10,18 @@ __H__
 __W__
 http://example.com
 __NEXT__
+Don't keep excessive whitespace
+__H__
+<strong> This thing</strong>
+__W__
+*This thing*
+__NEXT__
+Take care with external links
+__H__
+<img src="http://this.company.com/test/link.jpg">
+__W__
+http://this.company.com/test/link.jpg
+__NEXT__
 Leave {{This}} alone
 __H__
 <p>mark stubs with {{stub}}</p>
